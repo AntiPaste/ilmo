@@ -1,0 +1,19 @@
+// Vendor imports
+
+// Imports from node_modules start with ~ (no ~/)
+// Example: @import '~react-date-picker/base.css';
+
+
+
+// Component imports
+
+// We have gathered all component stylesheet imports here, and not at the begin
+// of each component JavaScript file. The reason is that webpack require for
+// non-JS resources is a bit magical, and sass @import statements are less so.
+// We prefer to have least amount of magic, without sacraficing too much
+// convenience.
+
+@import './static/css/bootstrap.min.css';
+@import './static/css/main.scss';
+@import './components/EventsView/EventsView.scss';
+@import './components/EventsList/EventsList.scss';

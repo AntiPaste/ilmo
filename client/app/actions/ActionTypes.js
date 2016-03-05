@@ -1,0 +1,4 @@
+export default {
+  EVENTS_RECEIVE: 'EVENTS_RECEIVE',
+  EVENT_RECEIVE: 'EVENT_RECEIVE',
+};

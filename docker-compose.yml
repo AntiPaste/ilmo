@@ -23,4 +23,7 @@ client:
   restart: always
   container_name: ilmo-frontend
   ports:
-    - "8000:80"
+    - "8000:8000"
+  volumes:
+    - "./client/app:/app"
+    - "/app/node_modules"

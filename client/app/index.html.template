@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Meta tags always come first -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1 , maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!-- End meta tags -->
+
+    <title>{%= o.htmlWebpackPlugin.options.title %}</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <!-- End CSS -->
+    <script src="/js/jquery-2.1.4.min.js"></script>
+
+  </head>
+  <body>
+    <div id="ilmo-frontend"></div>
+    <div class="clearfix"></div>
+
+    <footer></footer>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+.event-list {
+  display: flex;
+  flex-direction: column;
+
+  &-item {
+    display: block;
+    color: #FFF;
+    background: #0275d8;
+    border: 1px solid #0275d8;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      color: #FFF;
+      background-color: #025aa5;
+      border-color: #01549b;
+      text-decoration: none;
+    }
+  }
+}

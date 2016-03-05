@@ -1,10 +1,12 @@
-FROM alpine:latest
+FROM mhart/alpine-node:latest
 
-RUN apk add --update nginx && rm -rf /var/cache/apk/*
-RUN mkdir -p /tmp/nginx/client-body
+RUN apk add --update-cache build-base python
 
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY ./app /usr/share/nginx/html
+WORKDIR /app
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY ./app/package.json /app/package.json
+RUN npm install
+
+COPY ./app /app
+
+CMD ["npm", "run", "watch"]
