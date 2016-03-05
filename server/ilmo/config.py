@@ -1,7 +1,7 @@
 import os
 import json
+import logging
 import argparse
-import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', help='specify config file location')
@@ -13,4 +13,4 @@ if not os.path.exists(filepath) or not os.path.isfile(filepath):
 
 with open(filepath, 'r') as config_file:
     config = json.load(config_file)
-    print('Loaded environment "{}"'.format(config['environment']))
+    logging.info('Loaded environment "{}"'.format(config['environment']))

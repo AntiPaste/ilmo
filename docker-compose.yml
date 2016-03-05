@@ -11,8 +11,10 @@ server:
   build: ./server
   restart: always
   container_name: ilmo-backend
+  links:
+    - "database:database"
   ports:
-    - "9000:8000"
+    - "9000:5000"
   volumes:
     - "./server/ilmo:/ilmo"
 

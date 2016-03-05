@@ -2,6 +2,7 @@ FROM    frolvlad/alpine-python3
 
 ENV     ENVIRONMENT docker
 ENV     PYTHONPATH /
+ENV     PYTHONUNBUFFERED true
 
 # Install SSL certificates
 RUN     apk add --update build-base ca-certificates python-dev
@@ -21,4 +22,4 @@ COPY    ./config/ /etc/ilmo/
 # Expose port 8000
 EXPOSE  8000
 
-CMD     ["/usr/bin/python", "-m", "ilmo", "--config", "/etc/ilmo/docker.json"]
+CMD     ["/usr/bin/python3", "-m", "ilmo", "--config", "/etc/ilmo/docker.json"]

@@ -1,0 +1,7 @@
+{
+  "environment": "docker",
+  "database": {
+    "host": "database",
+    "name": "ilmo"
+  }
+}
