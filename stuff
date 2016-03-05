@@ -1,0 +1,49 @@
+- KOODAUS!
+
+
+Tapahtuma
+Ilmoittautuminen
+
+
+
+
+GET    /events
+POST   /events <- luo tapahtuman		X
+GET    /events/:id
+PUT    /events/:id <- muokkaa tapahtumaa	X
+DELETE /events/:id <- poistaa tapahtuman	X
+
+GET    /events/:id/registrations
+
+GET    /registrations
+POST   /registrations <- luo ilmoittautumisen, eli ilmoittautuu, request bodyssa tapahtuma ID
+GET    /registrations/:id
+PUT    /registrations/:id			X
+DELETE /registrations/:id			(token | X)
+
+
+{'events': [], 'errors': []}
+
+def create_event():
+	// Query for data
+	if data.inserts != 1:
+		return (None, errors.New())
+
+	return (data.generated_keys[0], None)
+
+
+
+How to display when the ilmo opens
+
+Event:
+{'id': 1, 'name': 'Testi', 'fields': [{
+	'key': <UUID>,
+	'label': 'Etunimi',
+	'type': 'text'
+}]}
+
+Registration:
+{'id': 1, 'event_id': 1, 'custom_fields': {
+	<UUID>: 'Markku',
+	<UUID2>: '
+}}
