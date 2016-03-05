@@ -1,0 +1,22 @@
+database:
+  build: ./database
+  restart: always
+  container_name: ilmo-db
+  ports:
+    - "8080:8080"
+    - "28015:28015"
+    - "29015:29015"
+
+server:
+  build: ./server
+  restart: always
+  container_name: ilmo-backend
+  ports:
+    - "9000:8000"
+
+client:
+  build: ./client
+  restart: always
+  container_name: ilmo-frontend
+  ports:
+    - "8000:80"
