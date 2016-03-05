@@ -13,6 +13,8 @@ server:
   container_name: ilmo-backend
   ports:
     - "9000:8000"
+  volumes:
+    - "./server/ilmo:/ilmo"
 
 client:
   build: ./client
