@@ -39,7 +39,7 @@ webpackConfig.devServer = {
   historyApiFallback: true,
   proxy: {
     '/api/*': {
-      target: 'http://localhost:8080', // Set api path and port here
+      target: 'http://backend:5000', // Set api path and port here
       xfwd: true,
     },
   },

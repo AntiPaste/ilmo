@@ -1,11 +1,13 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 
 from ilmo import app
 from ilmo import event
 from ilmo import registration
 
+bp = Blueprint('ilmo', __name__, url_prefix='/api')
 
-@app.route('/events', methods=['GET'])
+
+@bp.route('/events', methods=['GET'])
 def get_events():
     """
     Retrieves all events from the database.
@@ -13,7 +15,7 @@ def get_events():
     return jsonify({'events': event.get_all_events(), 'errors': []})
 
 
-@app.route('/events', methods=['POST'])
+@bp.route('/events', methods=['POST'])
 def create_event():
     """
     Inserts a new event to the database.
@@ -46,7 +48,7 @@ def create_event():
     return jsonify(response)
 
 
-@app.route('/events/<eid>', methods=['GET'])
+@bp.route('/events/<eid>', methods=['GET'])
 def get_event(eid=None):
     """
     Retrieves a single event from the database.
@@ -66,7 +68,7 @@ def get_event(eid=None):
     return jsonify(response)
 
 
-@app.route('/events/<eid>', methods=['PUT'])
+@bp.route('/events/<eid>', methods=['PUT'])
 def update_event(eid=None):
     """
     Updates a single event in the database.
@@ -104,7 +106,7 @@ def update_event(eid=None):
     return jsonify(response)
 
 
-@app.route('/events/<eid>/registrations', methods=['GET'])
+@bp.route('/events/<eid>/registrations', methods=['GET'])
 def get_registrations_of_event(eid=None):
     """
     Retrieves all registrations of certain event from the database.
@@ -122,7 +124,7 @@ def get_registrations_of_event(eid=None):
     return jsonify(response)
 
 
-@app.route('/registrations', methods=['GET'])
+@bp.route('/registrations', methods=['GET'])
 def get_registrations():
     """
     Retrieves all registrations from the database.
@@ -132,7 +134,7 @@ def get_registrations():
     })
 
 
-@app.route('/registrations', methods=['POST'])
+@bp.route('/registrations', methods=['POST'])
 def create_registration():
     """
     Inserts a new registration to the database
@@ -161,7 +163,7 @@ def create_registration():
     return jsonify(response)
 
 
-@app.route('/registrations/<rid>', methods=['GET'])
+@bp.route('/registrations/<rid>', methods=['GET'])
 def get_registration(rid=None):
     """
     Retrieves a single registration
@@ -179,7 +181,7 @@ def get_registration(rid=None):
     return jsonify(response)
 
 
-@app.route('/registrations/<rid>', methods=['PUT'])
+@bp.route('/registrations/<rid>', methods=['PUT'])
 def update_registration(rid=None):
     """
     Updates a single registration in the database.
@@ -215,3 +217,5 @@ def update_registration(rid=None):
         return jsonify(response)
     response['registration'] = registration.get_registration(updated_rid)
     return jsonify(response)
+
+app.register_blueprint(bp)

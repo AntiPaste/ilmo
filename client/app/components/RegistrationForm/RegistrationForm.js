@@ -38,14 +38,11 @@ const RegistrationForm = React.createClass({
 
   handleForm() {
     const data = {
-      custom_fields: [],
+      custom_fields: {},
     };
 
     this.props.event.fields.forEach((field) => {
-      const customField = {};
-      customField[field.key] = this.refs[field.key].getValue();
-
-      data.custom_fields.push(customField);
+      data.custom_fields[field.key] = this.refs[field.key].getValue();
     });
 
     this.props.registrationActionCreators.createRegistration(
