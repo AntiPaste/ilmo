@@ -13,7 +13,7 @@ def get_events():
     Retrieves all events from the database.
     """
 
-    return jsonify({'events': event.get_all_events(), 'errors': []})
+    return jsonify({'events': event.get_events(), 'errors': []})
 
 
 @bp.route('/events', methods=['POST'])
@@ -146,7 +146,7 @@ def get_registrations():
     """
 
     return jsonify({
-        'registrations': registration.get_all_registrations(),
+        'registrations': registration.get_registrations(),
         'errors': []
     })
 
