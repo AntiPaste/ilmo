@@ -2,6 +2,7 @@
   "environment": "docker",
   "database": {
     "host": "database",
+    "port": 28015,
     "name": "ilmo"
   }
 }

@@ -3,7 +3,10 @@ import rethinkdb as rethink
 from ilmo import config
 from ilmo import logger
 
-connection = rethink.connect(config['database']['host'], 28015)
+connection = rethink.connect(
+    config['database']['host'],
+    config['database']['port']
+)
 
 
 def setup(connection):

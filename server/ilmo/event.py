@@ -4,16 +4,16 @@ from ilmo import database
 from ilmo import config
 
 
-def get_all_events():
+def get_events():
     cursor = rethink.db(config['database']['name']).table(
         'events'
     ).run(database.connection)
     return list(cursor)
 
 
-def get_event(eid):
+def get_event(event_id):
     cursor = rethink.db(config['database']['name']).table('events').filter({
-        'id': eid
+        'id': event_id
     }).run(database.connection)
     return cursor.next()
 
@@ -23,20 +23,25 @@ def create_event(name, fields):
         'name': name,
         'fields': fields
     }).run(database.connection)
+
     if response['inserted'] != 1:
         return None, EventInsertionException()
-    return response['generated_keys'][0], None  # returns id
+
+    # return the inserted ID
+    return response['generated_keys'][0], None
 
 
-def update_event(eid, new_event):
+def update_event(event_id, new_event):
     response = rethink.db(config['database']['name']).table('events').filter({
-        'id': eid
+        'id': event_id
     }).update(
         new_event
     ).run(database.connection)
+
     if response['errors'] != 0:
         return None, EventUpdateException()
-    return eid, None
+
+    return event_id, None
 
 
 class EventInsertionException(Exception):
