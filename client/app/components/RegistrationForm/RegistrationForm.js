@@ -42,6 +42,8 @@ const RegistrationForm = React.createClass({
   },
 
   handleForm() {
+    if (this.props.createRegistrationLoading) return;
+
     let valid = true;
     const data = {
       custom_fields: {},
