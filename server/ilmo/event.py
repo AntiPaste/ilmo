@@ -4,18 +4,24 @@ from ilmo import database
 from ilmo import config
 
 
+def __add_keys_to_fields(fields):
+    for field in fields:
+        field['key'] = rethink.uuid()
+    return fields
+
+
 def get_events():
     cursor = rethink.db(config['database']['name']).table(
         'events'
     ).run(database.connection)
-    return list(cursor)
+    return list(cursor), None
 
 
 def get_event(event_id):
     event = rethink.db(config['database']['name']).table('events').get(
         event_id
     ).run(database.connection)
-    return event
+    return event, None
 
 
 def delete_event(event_id):
@@ -25,10 +31,11 @@ def delete_event(event_id):
     ).delete().run(database.connection)
 
     # return the removed event
-    return event
+    return event, None
 
 
 def create_event(name, fields):
+    fields = __add_keys_to_fields(fields)
     response = rethink.db(config['database']['name']).table('events').insert({
         'name': name,
         'fields': fields
@@ -42,6 +49,7 @@ def create_event(name, fields):
 
 
 def update_event(event_id, new_event):
+    new_event['fields'] = __add_keys_to_fields(new_event['fields'])
     response = rethink.db(config['database']['name']).table('events').get(
         event_id
     ).update(

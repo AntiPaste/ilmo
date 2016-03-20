@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 
 from ilmo import app
-from ilmo import event
-from ilmo import registration
+from ilmo import event as Event
+from ilmo import registration as Registration
 
 bp = Blueprint('ilmo', __name__, url_prefix='/api')
 
@@ -19,8 +19,9 @@ def get_events():
     """
     Retrieves all events from the database.
     """
-
-    return jsonify({'events': event.get_events(), 'errors': []})
+    events, err = Event.get_events()
+    # TODO: Handle error
+    return jsonify({'events': events, 'errors': []})
 
 
 @bp.route('/events', methods=['POST'])
@@ -43,8 +44,8 @@ def create_event():
         return jsonify(response), get_response_code(response)
 
     fields = request.json.get('fields', '')
-    event_id, err = event.create_event(name, fields)
-    if type(err) == event.EventInsertException:
+    event_id, err = Event.create_event(name, fields)
+    if type(err) == Event.EventInsertException:
         response['errors'].append({
             'status': 500,
             'source': 'database',
@@ -54,7 +55,7 @@ def create_event():
 
         return jsonify(response), get_response_code(response)
 
-    response['event'] = event.get_event(event_id)
+    response['event'] = Event.get_event(event_id)
     return jsonify(response)
 
 
@@ -75,7 +76,9 @@ def get_event(event_id=None):
 
         return jsonify(response), get_response_code(response)
 
-    response['event'] = event.get_event(event_id)
+    event, err = Event.get_event(event_id)
+    # TODO: Handle error
+    response['event'] = event
     return jsonify(response)
 
 
@@ -96,7 +99,9 @@ def delete_event(event_id=None):
 
         return jsonify(response), get_response_code(response)
 
-    response['event'] = event.get_event(event_id)
+    event, err = Event.get_event(event_id)
+    # TODO: Handle error
+    response['event'] = event
     return jsonify(response)
 
 
@@ -127,8 +132,8 @@ def update_event(event_id=None):
     if response['errors']:
         return jsonify(response), get_response_code(response)
 
-    updated_event_id, err = event.update_event(event_id, new_event)
-    if type(err) == event.EventUpdateException:
+    updated_event_id, err = Event.update_event(event_id, new_event)
+    if type(err) == Event.EventUpdateException:
         response['errors'].append({
             'status': 500,
             'source': 'database',
@@ -138,7 +143,9 @@ def update_event(event_id=None):
 
         return jsonify(response), get_response_code(response)
 
-    response['event'] = event.get_event(updated_event_id)
+    event, err = Event.get_event(updated_event_id)
+    # TODO: Handle error
+    response['event'] = event
     return jsonify(response)
 
 
@@ -159,7 +166,9 @@ def get_event_registrations(event_id=None):
 
         return jsonify(response), get_response_code(response)
 
-    response['registrations'] = registration.get_event_registrations(event_id)
+    registrations, err = Registration.get_event_registrations(event_id)
+    # TODO: Handle error
+    response['registrations'] = registrations
     return jsonify(response)
 
 
@@ -168,9 +177,10 @@ def get_registrations():
     """
     Retrieves all registrations from the database.
     """
-
+    registrations, err = Registration.get_registrations()
+    # TODO: Handle error
     return jsonify({
-        'registrations': registration.get_registrations(),
+        'registrations': registrations,
         'errors': []
     })
 
@@ -194,12 +204,12 @@ def create_registration():
         return jsonify(response), get_response_code(response)
 
     custom_fields = request.json.get('custom_fields', [])
-    registration_id, err = registration.create_registration(
+    registration_id, err = Registration.create_registration(
         event_id,
         custom_fields
     )
 
-    if type(err) == registration.RegistrationInsertException:
+    if type(err) == Registration.RegistrationInsertException:
         response['errors'].append({
             'status': 500,
             'source': 'database',
@@ -209,7 +219,7 @@ def create_registration():
 
         return jsonify(response), get_response_code(response)
 
-    elif type(err) == registration.RegistrationValidateException:
+    elif type(err) == Registration.RegistrationValidateException:
         response['errors'].append({
             'status': 500,
             'source': 'database',
@@ -221,7 +231,9 @@ def create_registration():
 
         return jsonify(response), get_response_code(response)
 
-    response['registration'] = registration.get_registration(registration_id)
+    registration, err = Registration.get_registration(registration_id)
+    # TODO: Handle error
+    response['registration'] = registration
     return jsonify(response)
 
 
@@ -242,7 +254,19 @@ def get_registration(registration_id=None):
 
         return jsonify(response), get_response_code(response)
 
-    response['registration'] = registration.get_registration(registration_id)
+    registration, err = Registration.get_registration(registration_id)
+    if err:
+        response['errors'].append({
+            'status': 404,
+            'source': 'registration_id',
+            'title': 'Registration ID not found',
+            'detail': 'Registration with requested ID cannot be found'
+        })
+
+        return jsonify(response), get_response_code(response)
+
+    # TODO: Handle error
+    response['registration'] = registration
     return jsonify(response)
 
 
@@ -273,12 +297,12 @@ def update_registration(registration_id=None):
     if response['errors']:
         return jsonify(response), get_response_code(response)
 
-    updated_registration_id, err = registration.update_registration(
+    updated_registration_id, err = Registration.update_registration(
         registration_id,
         new_registration
     )
 
-    if type(err) == registration.RegistrationUpdateException:
+    if type(err) == Registration.RegistrationUpdateException:
         response['errors'].append({
             'status': 500,
             'source': 'database',
@@ -288,9 +312,9 @@ def update_registration(registration_id=None):
 
         return jsonify(response), get_response_code(response)
 
-    response['registration'] = registration.get_registration(
-        updated_registration_id
-    )
+    registration, err = Registration.get_registration(updated_registration_id)
+    # TODO: Handle error
+    response['registration'] = registration
 
     return jsonify(response)
 

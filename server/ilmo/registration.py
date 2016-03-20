@@ -49,8 +49,10 @@ def get_registrations():
     ).run(database.connection)
 
     registrations = list(cursor)
+
+    # Return empty registrations
     if not registrations:
-        return None, RegistrationNotFoundException()
+        return registrations, None
 
     cursor = rethink.db(config['database']['name']).table(
         'events'
@@ -72,8 +74,9 @@ def get_registration(registration_id):
         'registrations'
     ).get(registration_id).run(database.connection)
 
+    # Return empty registration
     if not registration:
-        return RegistrationNotFoundException(), None
+        return registration, None
 
     cursor = rethink.db(config['database']['name']).table(
         'events'
@@ -91,7 +94,7 @@ def get_registration(registration_id):
 
 def delete_registration(registration_id):
     registration, err = get_registration(registration_id)
-    if err:
+    if not registration:
         return None, RegistrationNotFoundException()
     rethink.db(config['database']['name']).table('registrations').get(
         registration_id
@@ -107,7 +110,7 @@ def create_registration(event_id, custom_fields):
         'events'
     ).get(event_id).get_field('fields').run(database.connection)
 
-    fields = list(cursor)
+    fields = list(cursor)  # TODO: len(fields) == 0 -> invalid event ID error?
 
     custom_fields = __sanitize_registration(fields, custom_fields)
     invalid_fields = __validate_registration(fields, custom_fields)
@@ -132,9 +135,10 @@ def create_registration(event_id, custom_fields):
 
 def update_registration(registration_id, new_registration):
     registration, err = get_registration(registration_id)
-    if err:
+    if not registration:
         return None, RegistrationNotFoundException()
     event_id = registration.get('event_id')
+
     # Validate custom fields by comparing them to the event fields
     cursor = rethink.db(config['database']['name']).table(
         'events'
@@ -171,10 +175,11 @@ def get_event_registrations(event_id):
     ).filter({
         'event_id': event_id
     }).run(database.connection)
+    # TODO: exception for invalid event id?
 
     registrations = list(cursor)
     if not registrations:
-        return None, RegistrationNotFoundException()
+        return registrations, None
 
     cursor = rethink.db(config['database']['name']).table(
         'events'
