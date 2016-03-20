@@ -11,6 +11,7 @@ class RegistrationStore extends Store {
   getInitialState() {
     return {
       registrations: {},
+      createRegistrationLoading: false,
     };
   }
 
@@ -26,6 +27,14 @@ class RegistrationStore extends Store {
     switch (payload.type) {
     case ActionTypes.REGISTRATIONS_RECEIVE:
       this._state.registrations[payload.eventID] = payload.registrations;
+      this.__emitChange();
+      break;
+    case ActionTypes.CREATE_REGISTRATION_LOADING:
+      this._state.createRegistrationLoading = true;
+      this.__emitChange();
+      break;
+    case ActionTypes.CREATE_REGISTRATION_LOADING_FINISHED:
+      this._state.createRegistrationLoading = false;
       this.__emitChange();
       break;
     default:
