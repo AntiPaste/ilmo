@@ -44,7 +44,7 @@ def create_event():
 
     fields = request.json.get('fields', '')
     event_id, err = event.create_event(name, fields)
-    if type(err) == event.EventInsertionException:
+    if type(err) == event.EventInsertException:
         response['errors'].append({
             'status': 500,
             'source': 'database',
@@ -62,6 +62,27 @@ def create_event():
 def get_event(event_id=None):
     """
     Retrieves a single event from the database.
+    """
+
+    response = {'event': None, 'errors': []}
+    if not event_id:
+        response['errors'].append({
+            'status': 400,
+            'source': 'event_id',
+            'title': 'Event ID cannot be empty',
+            'detail': 'Requested ID was not a valid event ID'
+        })
+
+        return jsonify(response), get_response_code(response)
+
+    response['event'] = event.get_event(event_id)
+    return jsonify(response)
+
+
+@bp.route('/events/<event_id>', methods=['DELETE'])
+def delete_event(event_id=None):
+    """
+    Removes a single event from the database.
     """
 
     response = {'event': None, 'errors': []}
@@ -178,12 +199,24 @@ def create_registration():
         custom_fields
     )
 
-    if type(err) == registration.RegistrationInsertionException:
+    if type(err) == registration.RegistrationInsertException:
         response['errors'].append({
             'status': 500,
             'source': 'database',
             'title': 'Failed to insert a new registration',
             'detail': 'Registration was not inserted'
+        })
+
+        return jsonify(response), get_response_code(response)
+
+    elif type(err) == registration.RegistrationValidateException:
+        response['errors'].append({
+            'status': 500,
+            'source': 'database',
+            'title': 'Failed to validate a new registration',
+            'detail': 'Registration was not inserted. Invalid: {}'.format(
+                err.invalid_fields
+            )
         })
 
         return jsonify(response), get_response_code(response)

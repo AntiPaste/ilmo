@@ -12,10 +12,20 @@ def get_events():
 
 
 def get_event(event_id):
-    cursor = rethink.db(config['database']['name']).table('events').filter({
-        'id': event_id
-    }).run(database.connection)
-    return cursor.next()
+    event = rethink.db(config['database']['name']).table('events').get(
+        event_id
+    ).run(database.connection)
+    return event
+
+
+def delete_event(event_id):
+    event = get_event(event_id)
+    rethink.db(config['database']['name']).table('events').get(
+        event_id
+    ).delete().run(database.connection)
+
+    # return the removed event
+    return event
 
 
 def create_event(name, fields):
@@ -25,16 +35,16 @@ def create_event(name, fields):
     }).run(database.connection)
 
     if response['inserted'] != 1:
-        return None, EventInsertionException()
+        return None, EventInsertException()
 
     # return the inserted ID
     return response['generated_keys'][0], None
 
 
 def update_event(event_id, new_event):
-    response = rethink.db(config['database']['name']).table('events').filter({
-        'id': event_id
-    }).update(
+    response = rethink.db(config['database']['name']).table('events').get(
+        event_id
+    ).update(
         new_event
     ).run(database.connection)
 
@@ -44,7 +54,7 @@ def update_event(event_id, new_event):
     return event_id, None
 
 
-class EventInsertionException(Exception):
+class EventInsertException(Exception):
     pass
 
 

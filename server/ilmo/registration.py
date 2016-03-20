@@ -5,6 +5,9 @@ from ilmo import config
 
 
 def __map_custom_fields(fields, custom_fields):
+    """
+    Maps dict {question_id: answer} to {question_label: answer}
+    """
     new_fields = {}
     for key, value in custom_fields.items():
         for field in fields:
@@ -17,6 +20,29 @@ def __map_custom_fields(fields, custom_fields):
     return new_fields
 
 
+def __sanitize_registration(fields, custom_fields):
+    sanitized_fields = custom_fields.copy()
+    for field_id in custom_fields:
+        # Find field with key matching to the field id
+        field = [f for f in fields if f['key'] == field_id]
+        if not field:
+            sanitized_fields.pop(field_id)
+    return sanitized_fields
+
+
+def __validate_registration(fields, custom_fields):
+    invalid_fields = []
+    for field_id in custom_fields:
+        # Find field with key matching to the field id
+        field = [f for f in fields if f['key'] == field_id]
+
+        # Field is invalid if mandatory value is empty
+        if not (field[0]['optional'] or custom_fields[field_id]):
+            invalid_fields.push(field_id)
+
+    return invalid_fields
+
+
 def get_registrations():
     cursor = rethink.db(config['database']['name']).table(
         'registrations'
@@ -24,7 +50,7 @@ def get_registrations():
 
     registrations = list(cursor)
     if not registrations:
-        return registrations
+        return None, RegistrationNotFoundException()
 
     cursor = rethink.db(config['database']['name']).table(
         'events'
@@ -38,17 +64,16 @@ def get_registrations():
         new_fields = __map_custom_fields(fields, registration['custom_fields'])
         registration['custom_fields'] = new_fields
 
-    return registrations
+    return registrations, None
 
 
 def get_registration(registration_id):
-    cursor = rethink.db(config['database']['name']).table(
+    registration = rethink.db(config['database']['name']).table(
         'registrations'
-    ).filter({'id': registration_id}).run(database.connection)
+    ).get(registration_id).run(database.connection)
 
-    registration = cursor.next()
     if not registration:
-        return registration
+        return RegistrationNotFoundException(), None
 
     cursor = rethink.db(config['database']['name']).table(
         'events'
@@ -61,10 +86,36 @@ def get_registration(registration_id):
     new_fields = __map_custom_fields(fields, registration['custom_fields'])
     registration['custom_fields'] = new_fields
 
-    return registration
+    return registration, None
+
+
+def delete_registration(registration_id):
+    registration, err = get_registration(registration_id)
+    if err:
+        return None, RegistrationNotFoundException()
+    rethink.db(config['database']['name']).table('registrations').get(
+        registration_id
+    ).delete().run(database.connection)
+
+    # return the removed registration
+    return registration, None
 
 
 def create_registration(event_id, custom_fields):
+    # Validate custom fields by comparing them to the event fields
+    cursor = rethink.db(config['database']['name']).table(
+        'events'
+    ).get(event_id).get_field('fields').run(database.connection)
+
+    fields = list(cursor)
+
+    custom_fields = __sanitize_registration(fields, custom_fields)
+    invalid_fields = __validate_registration(fields, custom_fields)
+    if invalid_fields:
+        return None, RegistrationValidateException(
+            'Invalid fields', invalid_fields
+        )
+
     response = rethink.db(config['database']['name']).table(
         'registrations'
     ).insert({
@@ -73,18 +124,38 @@ def create_registration(event_id, custom_fields):
     }).run(database.connection)
 
     if response['inserted'] != 1:
-        return None, RegistrationInsertionException()
+        return None, RegistrationInsertException()
 
     # returns the inserted ID
     return response['generated_keys'][0], None
 
 
 def update_registration(registration_id, new_registration):
+    registration, err = get_registration(registration_id)
+    if err:
+        return None, RegistrationNotFoundException()
+    event_id = registration.get('event_id')
+    # Validate custom fields by comparing them to the event fields
+    cursor = rethink.db(config['database']['name']).table(
+        'events'
+    ).get(event_id).get_field('fields').run(database.connection)
+
+    fields = list(cursor)
+
+    custom_fields = __sanitize_registration(
+        fields, registration.get('custom_fields')
+    )
+    invalid_fields = __validate_registration(fields, custom_fields)
+    if invalid_fields:
+        return None, RegistrationValidateException(
+            'Invalid fields', invalid_fields
+        )
+
     response = rethink.db(config['database']['name']).table(
         'registrations'
-    ).filter({
-        'id': registration_id
-    }).update(
+    ).get(
+        registration_id
+    ).update(
         new_registration
     ).run(database.connection)
 
@@ -103,7 +174,7 @@ def get_event_registrations(event_id):
 
     registrations = list(cursor)
     if not registrations:
-        return registrations
+        return None, RegistrationNotFoundException()
 
     cursor = rethink.db(config['database']['name']).table(
         'events'
@@ -115,12 +186,23 @@ def get_event_registrations(event_id):
         new_fields = __map_custom_fields(fields, registration['custom_fields'])
         registration['custom_fields'] = new_fields
 
-    return registrations
+    return registrations, None
 
 
-class RegistrationInsertionException(Exception):
+class RegistrationValidateException(Exception):
+    def __init__(self, message, invalid_fields):
+        # Call the base class constructor with the parameters it needs
+        super(RegistrationValidateException, self).__init__(message)
+        self.invalid_fields = invalid_fields
+
+
+class RegistrationInsertException(Exception):
     pass
 
 
 class RegistrationUpdateException(Exception):
+    pass
+
+
+class RegistrationNotFoundException(Exception):
     pass
