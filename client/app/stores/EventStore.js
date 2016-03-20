@@ -12,6 +12,7 @@ class EventStore extends Store {
     return {
       events: null,
       event: null,
+      createEventLoading: false,
     };
   }
 
@@ -31,6 +32,10 @@ class EventStore extends Store {
       break;
     case ActionTypes.EVENT_RECEIVE:
       this._state.event = payload.event;
+      this.__emitChange();
+      break;
+    case ActionTypes.CREATE_EVENT_LOADING:
+      this._state.createEventLoading = payload.loading;
       this.__emitChange();
       break;
     default:

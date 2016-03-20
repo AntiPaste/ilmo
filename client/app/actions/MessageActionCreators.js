@@ -7,6 +7,7 @@ class MessageActionCreators extends CommonActionCreators {
   }
 
   addMessage(message) {
+    console.log(message);
     this._dispatcher.dispatch({
       type: ActionTypes.MESSAGES_ADD,
       message: message,

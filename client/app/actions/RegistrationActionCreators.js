@@ -35,6 +35,7 @@ class RegistrationActionCreators extends CommonActionCreators {
 
     this._dispatcher.dispatch({
       type: ActionTypes.CREATE_REGISTRATION_LOADING,
+      loading: true,
     });
 
     this._apiUtils.post(`/registrations`, data)
@@ -56,7 +57,8 @@ class RegistrationActionCreators extends CommonActionCreators {
       })
       .finally(() => {
         this._dispatcher.dispatch({
-          type: ActionTypes.CREATE_REGISTRATION_LOADING_FINISHED,
+          type: ActionTypes.CREATE_REGISTRATION_LOADING,
+          loading: false,
         });
       });
   }

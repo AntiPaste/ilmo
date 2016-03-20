@@ -1,0 +1,6 @@
+{
+  "name": "EventCreateForm",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./EventCreateForm.js"
+}

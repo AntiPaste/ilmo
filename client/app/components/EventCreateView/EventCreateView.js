@@ -1,18 +1,12 @@
-/**
- * ExampleView.js - React component ExampleView
- *
- * Copyright 2015 Taito United Oy
- * All rights reserved.
- */
-
 import React from 'react';
 import Messages from '../Messages';
 import Breadcrumbs from '../Breadcrumbs';
-import EventsList from '../EventsList';
+import EventCreateForm from '../EventCreateForm';
 
-const EventsView = React.createClass({
+const EventCreateView = React.createClass({
   propTypes: {
     eventStore: React.PropTypes.object.isRequired,
+    eventActionCreators: React.PropTypes.object.isRequired,
     messageStore: React.PropTypes.object.isRequired,
     messageActionCreators: React.PropTypes.object.isRequired,
   },
@@ -43,7 +37,9 @@ const EventsView = React.createClass({
 
   _getPath() {
     const path = [];
+
     path.push({ name: 'Etusivu', url: '/' });
+    path.push({ name: 'Lisää tapahtuma', url: '/events/create' });
 
     return path;
   },
@@ -57,15 +53,13 @@ const EventsView = React.createClass({
         />
 
         <Breadcrumbs path={this._getPath()} />
-
-        <a href='/events/create'>Lisää tapahtuma</a>
-
-        <br />
-
-        <EventsList events={this.state.eventState.events} />
+        <EventCreateForm
+          createEventLoading={this.state.eventState.createEventLoading}
+          eventActionCreators={this.props.eventActionCreators}
+        />
       </div>
     );
   },
 });
 
-export default EventsView;
+export default EventCreateView;

@@ -30,11 +30,7 @@ class RegistrationStore extends Store {
       this.__emitChange();
       break;
     case ActionTypes.CREATE_REGISTRATION_LOADING:
-      this._state.createRegistrationLoading = true;
-      this.__emitChange();
-      break;
-    case ActionTypes.CREATE_REGISTRATION_LOADING_FINISHED:
-      this._state.createRegistrationLoading = false;
+      this._state.createRegistrationLoading = payload.loading;
       this.__emitChange();
       break;
     default:

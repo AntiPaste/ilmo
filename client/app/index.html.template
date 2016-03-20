@@ -10,7 +10,7 @@
     <title>{%= o.htmlWebpackPlugin.options.title %}</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ionicons.min.css">
     <!-- End CSS -->
     <script src="/js/jquery-2.1.4.min.js"></script>
 

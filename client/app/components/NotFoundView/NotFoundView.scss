@@ -1,0 +1,26 @@
+.NotFoundView {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+
+  .container-fluid {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+  }
+
+  &-content {
+    flex: 1;
+    padding-top: 40px;
+  }
+
+  &-heading {
+    margin: 40px 0;
+  }
+
+  .text-white {
+    color: #FFFFFF;
+  }
+}

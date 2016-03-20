@@ -1,12 +1,16 @@
 import CommonActionCreators from './CommonActionCreators';
+import MessageActionCreators from './MessageActionCreators';
 import ActionTypes from './ActionTypes';
-// import ErrorTypes from '../../shared/ErrorTypes';
-
-// import { defineMessages } from 'react-intl';
+import 'bluebird';
 
 class EventActionCreators extends CommonActionCreators {
   constructor(dispatcher, apiUtils) {
     super(dispatcher, apiUtils);
+
+    this.messageActionCreators = new MessageActionCreators(
+      dispatcher,
+      apiUtils
+    );
   }
 
   getEvents() {
@@ -32,6 +36,37 @@ class EventActionCreators extends CommonActionCreators {
       })
       .catch((error) => {
         console.log(error);
+      });
+  }
+
+  createEvent(data, extra) {
+    this._dispatcher.dispatch({
+      type: ActionTypes.CREATE_EVENT_LOADING,
+      loading: true,
+    });
+
+    this._apiUtils.post('/events', data)
+      .then((response) => {
+        console.log(response);
+        this.messageActionCreators.addFutureMessage({
+          type: 'success',
+          content: extra.messages.success,
+        });
+
+        this.redirect(extra.redirect);
+      })
+      .catch((error) => {
+        console.error(error.popsicle.response.body.errors);
+        this.messageActionCreators.addMessage({
+          type: 'danger',
+          content: extra.messages.error,
+        });
+      })
+      .finally(() => {
+        this._dispatcher.dispatch({
+          type: ActionTypes.CREATE_EVENT_LOADING,
+          loading: false,
+        });
       });
   }
 }

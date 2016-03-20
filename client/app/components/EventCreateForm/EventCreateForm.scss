@@ -1,0 +1,43 @@
+.event-create-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  &-controls {
+    margin-top: auto;
+  }
+
+  .form {
+    display: flex;
+
+    .checkbox-inline {
+      margin-top: 7px;
+    }
+  }
+
+  .form-add-field {
+    font-size: 48px;
+    color: #66bb6a;
+
+    & i:before {
+      content: '\f48a';
+    }
+
+    & i:hover:before {
+      content: '\f48b';
+    }
+  }
+
+  .form-remove-field {
+    font-size: 28px;
+    color: #ef5350;
+
+    & i:before {
+      content: '\f463';
+    }
+
+    & i:hover:before {
+      content: '\f464';
+    }
+  }
+}

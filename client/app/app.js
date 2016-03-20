@@ -30,7 +30,10 @@ import ApiUtils from './utils/ApiUtils';
 import MessageStore from './stores/MessageStore';
 import MessageActionCreators from './actions/MessageActionCreators';
 
+import NotFoundView from './components/NotFoundView';
+
 import EventsView from './components/EventsView';
+import EventCreateView from './components/EventCreateView';
 import EventView from './components/EventView';
 import EventStore from './stores/EventStore';
 import EventActionCreators from './actions/EventActionCreators';
@@ -75,6 +78,7 @@ const eventsViewRoute = () => {
 
   const props = {
     eventStore,
+    messageStore, messageActionCreators,
   };
 
   ReactDOM.render(
@@ -87,6 +91,19 @@ page('/', eventsViewRoute);
 page('/events', eventsViewRoute);
 
 
+page('/events/create', () => {
+  const props = {
+    eventStore, eventActionCreators,
+    messageStore, messageActionCreators,
+  };
+
+  ReactDOM.render(
+    <EventCreateView {...props} />,
+    document.getElementById('ilmo-frontend')
+  );
+});
+
+
 page('/events/:id', ({ params }) => {
   eventActionCreators.getEvent(params.id);
   registrationActionCreators.getEventRegistrations(params.id);
@@ -94,7 +111,8 @@ page('/events/:id', ({ params }) => {
   const props = {
     eventID: params.id,
     messageStore, messageActionCreators,
-    eventStore, registrationStore,
+    eventStore,
+    registrationStore,
   };
 
   ReactDOM.render(
@@ -145,12 +163,12 @@ page('/events/:id/register', ({ params }) => {
 }); */
 
 
-/* page('*', () => {
+page('*', () => {
   ReactDOM.render(
     <NotFoundView />,
     document.getElementById('ilmo-frontend')
   );
-}); */
+});
 
 
 page.start();
