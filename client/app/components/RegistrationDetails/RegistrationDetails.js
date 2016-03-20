@@ -7,7 +7,7 @@ const RegistrationDetails = React.createClass({
 
   _getContent() {
     return (
-      <div>
+      <div className='registration-details'>
         <div>Ilmoittautuminen tapahtumaan: {this.props.event.name}</div>
       </div>
     );

@@ -7,7 +7,7 @@ const EventDetails = React.createClass({
 
   _getContent() {
     return (
-      <div>
+      <div className='event-details'>
         <div>Nimi: {this.props.event.name}</div>
         <a href={`/events/${this.props.event.id}/register`}>Ilmoittaudu</a>
       </div>

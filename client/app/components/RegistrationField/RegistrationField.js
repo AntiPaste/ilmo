@@ -1,4 +1,5 @@
 import React from 'react';
+import classnames from 'classnames';
 
 const RegistrationField = React.createClass({
   propTypes: {
@@ -8,36 +9,89 @@ const RegistrationField = React.createClass({
   getInitialState() {
     return {
       radioSelection: null,
+      error: false,
     };
   },
 
   getValue() {
     if (this.props.field.type === 'radio') {
       return this.state.radioSelection;
+    } else if (this.props.field.type === 'select') {
+      if (this.refs.input.value === 'SELECT_PLACEHOLDER') {
+        return null;
+      }
     }
 
     return this.refs.input.value;
   },
 
+  setError(error) {
+    this.setState({
+      error: error,
+    });
+  },
+
+  isRequired() {
+    return !this.props.field.optional;
+  },
+
   renderText() {
+    const groupClasses = classnames(
+      'form-group', {
+        'has-danger': this.state.error,
+      }
+    );
+
+    const fieldClasses = classnames(
+      'form-control', {
+        'form-control-danger': this.state.error,
+      }
+    );
+
+    const textClasses = classnames(
+      'text-danger', {
+        'hidden-xs-up': !this.state.error,
+      }
+    );
+
     return (
-      <fieldset className='form-group'>
-        <label>{this.props.field.label}</label>
+      <fieldset className={groupClasses}>
+        <label>
+          {this.props.field.optional ? '' : '*'} {this.props.field.label}
+        </label>
 
         <input
           ref='input'
           type='text'
-          className='form-control'
+          className={fieldClasses}
           name={this.props.field.key}
         />
+
+        <small className={textClasses}>
+          Pakollinen kenttä ei voi olla tyhjä.
+        </small>
       </fieldset>
     );
   },
 
   renderRadio() {
+    const groupClasses = classnames(
+      'form-group', {
+        'has-danger': this.state.error,
+      }
+    );
+
+    const textClasses = classnames(
+      'text-danger', {
+        'hidden-xs-up': !this.state.error,
+      }
+    );
+
     return (
-      <fieldset className='form-group'>
-        <label>{this.props.field.label}</label>
+      <fieldset className={groupClasses}>
+        <label>
+          {this.props.field.optional ? '' : '*'} {this.props.field.label}
+        </label>
 
         {this.props.field.choices.map((choice, index) => {
           return (
@@ -59,24 +113,57 @@ const RegistrationField = React.createClass({
             </div>
           );
         })}
+
+        <small className={textClasses}>
+          Pakollinen valinta ei voi olla tyhjä.
+        </small>
       </fieldset>
     );
   },
 
   renderSelect() {
+    const groupClasses = classnames(
+      'form-group', {
+        'has-danger': this.state.error,
+      }
+    );
+
+    const fieldClasses = classnames(
+      'form-control', {
+        'form-control-danger': this.state.error,
+      }
+    );
+
+    const textClasses = classnames(
+      'text-danger', {
+        'hidden-xs-up': !this.state.error,
+      }
+    );
+
     return (
-      <fieldset className='form-group'>
-        <label>{this.props.field.label}</label>
+      <fieldset className={groupClasses}>
+        <label>
+          {this.props.field.optional ? '' : '*'} {this.props.field.label}
+        </label>
 
         <select
           ref='input'
-          className='form-control'
+          className={fieldClasses}
           name={this.props.field.key}
+          defaultValue='SELECT_PLACEHOLDER'
         >
+          <option disabled value='SELECT_PLACEHOLDER'>
+            Valitse {this.props.field.label.toLowerCase()}
+          </option>
+
           {this.props.field.choices.map((choice, index) => {
-            return <option key={index}>{choice}</option>;
+            return <option key={index} value={choice}>{choice}</option>;
           })}
         </select>
+
+        <small className={textClasses}>
+          Pakollinen valinta ei voi olla tyhjä.
+        </small>
       </fieldset>
     );
   },

@@ -4,18 +4,64 @@ from ilmo import database
 from ilmo import config
 
 
+def __map_custom_fields(fields, custom_fields):
+    new_fields = {}
+    for key, value in custom_fields.items():
+        for field in fields:
+            if field['key'] != key:
+                continue
+
+            new_fields[field['label']] = value
+            break
+
+    return new_fields
+
+
 def get_registrations():
     cursor = rethink.db(config['database']['name']).table(
         'registrations'
     ).run(database.connection)
-    return list(cursor)
+
+    registrations = list(cursor)
+    if not registrations:
+        return registrations
+
+    cursor = rethink.db(config['database']['name']).table(
+        'events'
+    ).get(
+        registrations[0]['event_id']
+    ).get_field('fields').run(database.connection)
+
+    fields = list(cursor)
+
+    for registration in registrations:
+        new_fields = __map_custom_fields(fields, registration['custom_fields'])
+        registration['custom_fields'] = new_fields
+
+    return registrations
 
 
 def get_registration(registration_id):
     cursor = rethink.db(config['database']['name']).table(
         'registrations'
     ).filter({'id': registration_id}).run(database.connection)
-    return cursor.next()
+
+    registration = cursor.next()
+    if not registration:
+        return registration
+
+    cursor = rethink.db(config['database']['name']).table(
+        'events'
+    ).get(
+        registration['event_id']
+    ).get_field('fields').run(database.connection)
+
+    fields = list(cursor)
+
+    new_fields = __map_custom_fields(fields, registration['custom_fields'])
+    registration['custom_fields'] = new_fields
+
+    return registration
 
 
 def create_registration(event_id, custom_fields):
@@ -48,7 +94,7 @@ def update_registration(registration_id, new_registration):
     return registration_id, None
 
 
-def get_registrations_of_event(event_id):
+def get_event_registrations(event_id):
     cursor = rethink.db(config['database']['name']).table(
         'registrations'
     ).filter({
@@ -56,6 +102,8 @@ def get_registrations_of_event(event_id):
     }).run(database.connection)
 
     registrations = list(cursor)
+    if not registrations:
+        return registrations
 
     cursor = rethink.db(config['database']['name']).table(
         'events'
@@ -64,15 +112,7 @@ def get_registrations_of_event(event_id):
     fields = list(cursor)
 
     for registration in registrations:
-        new_fields = {}
-        for key, value in registration['custom_fields'].items():
-            for field in fields:
-                if field['key'] != key:
-                    continue
-
-                new_fields[field['label']] = value
-                break
-
+        new_fields = __map_custom_fields(fields, registration['custom_fields'])
         registration['custom_fields'] = new_fields
 
     return registrations

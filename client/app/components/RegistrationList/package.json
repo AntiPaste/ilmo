@@ -1,0 +1,6 @@
+{
+  "name": "RegistrationList",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./RegistrationList.js"
+}

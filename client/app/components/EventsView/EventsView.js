@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import Breadcrumbs from '../Breadcrumbs';
 import EventsList from '../EventsList';
 
 const EventsView = React.createClass({
@@ -37,9 +38,17 @@ const EventsView = React.createClass({
     };
   },
 
+  _getPath() {
+    const path = [];
+    path.push({ name: 'Etusivu', url: '/' });
+
+    return path;
+  },
+
   render() {
     return (
       <div className='container'>
+        <Breadcrumbs path={this._getPath()} />
         <EventsList events={this.state.eventState.events} />
       </div>
     );

@@ -39,7 +39,9 @@ Event:
 {'id': 1, 'name': 'Testi', 'fields': [{
 	'key': <UUID>,
 	'label': 'Etunimi',
-	'type': 'text'
+	'type': 'text',
+	'optional': true,
+	'public': true,
 }]}
 
 Registration:

@@ -7,6 +7,13 @@ from ilmo import registration
 bp = Blueprint('ilmo', __name__, url_prefix='/api')
 
 
+def get_response_code(response):
+    if len(response['errors']) > 1:
+        return 400
+
+    return response['errors'][0]['status']
+
+
 @bp.route('/events', methods=['GET'])
 def get_events():
     """
@@ -33,7 +40,7 @@ def create_event():
             'detail': 'Event must have a name that is not an empty string'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
     fields = request.json.get('fields', '')
     event_id, err = event.create_event(name, fields)
@@ -45,7 +52,7 @@ def create_event():
             'detail': 'Event was not inserted into the database'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
     response['event'] = event.get_event(event_id)
     return jsonify(response)
@@ -66,7 +73,7 @@ def get_event(event_id=None):
             'detail': 'Requested ID was not a valid event ID'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
     response['event'] = event.get_event(event_id)
     return jsonify(response)
@@ -87,8 +94,6 @@ def update_event(event_id=None):
             'detail': 'Requested ID was not a valid event ID'
         })
 
-        return jsonify(response)
-
     new_event = request.json.get('event', '')
     if not new_event:
         response['errors'].append({
@@ -98,7 +103,8 @@ def update_event(event_id=None):
             'detail': 'New event cannot be empty'
         })
 
-        return jsonify(response)
+    if response['errors']:
+        return jsonify(response), get_response_code(response)
 
     updated_event_id, err = event.update_event(event_id, new_event)
     if type(err) == event.EventUpdateException:
@@ -109,14 +115,14 @@ def update_event(event_id=None):
             'detail': 'Event was not updated'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
     response['event'] = event.get_event(updated_event_id)
     return jsonify(response)
 
 
 @bp.route('/events/<event_id>/registrations', methods=['GET'])
-def get_registrations_of_event(event_id=None):
+def get_event_registrations(event_id=None):
     """
     Retrieves all registrations of a certain event from the database.
     """
@@ -130,12 +136,9 @@ def get_registrations_of_event(event_id=None):
             'detail': 'Requested ID was not a valid event id'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
-    response['registrations'] = registration.get_registrations_of_event(
-        event_id
-    )
-
+    response['registrations'] = registration.get_event_registrations(event_id)
     return jsonify(response)
 
 
@@ -167,7 +170,7 @@ def create_registration():
             'detail': 'Registration must have a valid event ID'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
     custom_fields = request.json.get('custom_fields', [])
     registration_id, err = registration.create_registration(
@@ -182,7 +185,8 @@ def create_registration():
             'title': 'Failed to insert a new registration',
             'detail': 'Registration was not inserted'
         })
-        return jsonify(response)
+
+        return jsonify(response), get_response_code(response)
 
     response['registration'] = registration.get_registration(registration_id)
     return jsonify(response)
@@ -203,7 +207,7 @@ def get_registration(registration_id=None):
             'detail': 'Registration ID is not valid'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
     response['registration'] = registration.get_registration(registration_id)
     return jsonify(response)
@@ -224,8 +228,6 @@ def update_registration(registration_id=None):
             'detail': 'Registration ID is not valid'
         })
 
-        return jsonify(response)
-
     new_registration = request.json.get('registration', '')
     if not new_registration:
         response['errors'].append({
@@ -235,7 +237,8 @@ def update_registration(registration_id=None):
             'detail': 'New registration cannot be empty'
         })
 
-        return jsonify(response)
+    if response['errors']:
+        return jsonify(response), get_response_code(response)
 
     updated_registration_id, err = registration.update_registration(
         registration_id,
@@ -250,7 +253,7 @@ def update_registration(registration_id=None):
             'detail': 'Registration was not updated'
         })
 
-        return jsonify(response)
+        return jsonify(response), get_response_code(response)
 
     response['registration'] = registration.get_registration(
         updated_registration_id

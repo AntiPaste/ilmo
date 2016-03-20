@@ -1,0 +1,13 @@
+.messages {
+  position: fixed;
+  text-align: center;
+  z-index: 10000;
+  top: 10px;
+  left: 0;
+  right: 0;
+
+  &-message {
+    display: inline-block;
+    min-width: 33%;
+  }
+}

@@ -1,4 +1,5 @@
 import popsicle from 'popsicle';
+import status from 'popsicle-status';
 // import page from 'page';
 
 // import CommonActionCreators from '../actions/CommonActionCreators';
@@ -12,7 +13,8 @@ class ApiUtils {
     const promise = popsicle
       .get({
         url: `${this._apiBaseUrl}${path}`,
-      });
+      })
+      .use(status());
 
     return this._addDebugging(promise);
   }
@@ -25,7 +27,8 @@ class ApiUtils {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
+      .use(status());
 
     return this._addDebugging(promise);
   }

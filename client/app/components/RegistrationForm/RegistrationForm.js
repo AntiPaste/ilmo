@@ -37,17 +37,33 @@ const RegistrationForm = React.createClass({
   },
 
   handleForm() {
+    let valid = true;
     const data = {
       custom_fields: {},
     };
 
     this.props.event.fields.forEach((field) => {
-      data.custom_fields[field.key] = this.refs[field.key].getValue();
+      const value = this.refs[field.key].getValue();
+      const isRequired = this.refs[field.key].isRequired();
+      const error = (isRequired && !value);
+
+      if (error) valid = false;
+      this.refs[field.key].setError(error);
+
+      data.custom_fields[field.key] = value;
     });
 
+    if (!valid) return;
     this.props.registrationActionCreators.createRegistration(
       this.props.event.id,
       data,
+      {
+        redirect: `/events/${this.props.event.id}`,
+        messages: {
+          success: 'Ilmoittautumisesi on kirjattu!',
+          error: 'Ilmoittautumisen kirjaamisessa tapahtui virhe',
+        },
+      }
     );
   },
 

@@ -27,12 +27,16 @@ import ApiUtils from './utils/ApiUtils';
 
 
 // --  REACT & FLUX COMPONENTS, STORES AND ACTIONS --
+import MessageStore from './stores/MessageStore';
+import MessageActionCreators from './actions/MessageActionCreators';
+
 import EventsView from './components/EventsView';
 import EventView from './components/EventView';
 import EventStore from './stores/EventStore';
 import EventActionCreators from './actions/EventActionCreators';
 
 import RegistrationView from './components/RegistrationView';
+import RegistrationStore from './stores/RegistrationStore';
 import RegistrationActionCreators from './actions/RegistrationActionCreators';
 
 
@@ -40,8 +44,11 @@ const apiBaseUrl = process.env.API_BASE_PATH;
 const dispatcher = new Dispatcher();
 const apiUtils = new ApiUtils(apiBaseUrl);
 
+const messageStore = new MessageStore(dispatcher);
 const eventStore = new EventStore(dispatcher);
+const registrationStore = new RegistrationStore(dispatcher);
 
+const messageActionCreators = new MessageActionCreators(dispatcher, apiUtils);
 const eventActionCreators = new EventActionCreators(dispatcher, apiUtils);
 const registrationActionCreators = new RegistrationActionCreators(dispatcher, apiUtils);
 
@@ -57,7 +64,9 @@ if (process.env.DEBUG) {
 // -- ROUTES! --
 page.base(process.env.APP_BASE_PATH);
 
+// Middleware for clearing messages on page change
 page((context, next) => {
+  messageActionCreators.clearMessages();
   next();
 });
 
@@ -80,9 +89,12 @@ page('/events', eventsViewRoute);
 
 page('/events/:id', ({ params }) => {
   eventActionCreators.getEvent(params.id);
+  registrationActionCreators.getEventRegistrations(params.id);
 
   const props = {
-    eventStore,
+    eventID: params.id,
+    messageStore, messageActionCreators,
+    eventStore, registrationStore,
   };
 
   ReactDOM.render(
@@ -96,6 +108,7 @@ page('/events/:id/register', ({ params }) => {
   eventActionCreators.getEvent(params.id);
 
   const props = {
+    messageStore, messageActionCreators,
     eventStore, registrationActionCreators,
   };
 
