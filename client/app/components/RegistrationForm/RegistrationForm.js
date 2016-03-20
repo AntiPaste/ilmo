@@ -1,9 +1,11 @@
 import React from 'react';
+import Loading from '../Loading';
 import RegistrationField from '../RegistrationField';
 
 const RegistrationForm = React.createClass({
   propTypes: {
     event: React.PropTypes.object,
+    createRegistrationLoading: React.PropTypes.bool,
     registrationActionCreators: React.PropTypes.object.isRequired,
   },
 
@@ -22,12 +24,15 @@ const RegistrationForm = React.createClass({
 
         <br />
 
-        <input
-          type='button'
-          value='Ilmoittaudu!'
-          className='btn btn-primary'
+        <button
+          className='btn btn-primary btn-loading'
           onClick={this.handleForm}
-        />
+        >
+          <Loading
+            loading={this.props.createRegistrationLoading}
+            placeholder='Ilmoittaudu!'
+          />
+        </button>
       </div>
     );
   },

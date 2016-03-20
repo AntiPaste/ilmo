@@ -1,6 +1,7 @@
 import CommonActionCreators from './CommonActionCreators';
 import MessageActionCreators from './MessageActionCreators';
 import ActionTypes from './ActionTypes';
+import 'bluebird';
 
 class RegistrationActionCreators extends CommonActionCreators {
   constructor(dispatcher, apiUtils) {
@@ -32,6 +33,10 @@ class RegistrationActionCreators extends CommonActionCreators {
       ...registration,
     };
 
+    this._dispatcher.dispatch({
+      type: ActionTypes.CREATE_REGISTRATION_LOADING,
+    });
+
     this._apiUtils.post(`/registrations`, data)
       .then((response) => {
         console.log(response);
@@ -47,6 +52,11 @@ class RegistrationActionCreators extends CommonActionCreators {
         this.messageActionCreators.addMessage({
           type: 'danger',
           content: extra.messages.error,
+        });
+      })
+      .finally(() => {
+        this._dispatcher.dispatch({
+          type: ActionTypes.CREATE_REGISTRATION_LOADING_FINISHED,
         });
       });
   }

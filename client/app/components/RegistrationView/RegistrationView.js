@@ -8,6 +8,7 @@ const RegistrationView = React.createClass({
   propTypes: {
     messageStore: React.PropTypes.object.isRequired,
     eventStore: React.PropTypes.object.isRequired,
+    registrationStore: React.PropTypes.object.isRequired,
     messageActionCreators: React.PropTypes.object.isRequired,
     registrationActionCreators: React.PropTypes.object.isRequired,
   },
@@ -20,10 +21,16 @@ const RegistrationView = React.createClass({
     this._eventStoreSubscription = this.props.eventStore.addListener(
       this._onStoreChange
     );
+
+    this._registrationStoreSubscription =
+      this.props.registrationStore.addListener(
+        this._onStoreChange
+      );
   },
 
   componentWillUnmount() {
     this._eventStoreSubscription.remove();
+    this._registrationStoreSubscription.remove();
   },
 
   _onStoreChange() {
@@ -33,6 +40,7 @@ const RegistrationView = React.createClass({
   _getStoreData() {
     return {
       eventState: this.props.eventStore.getState(),
+      registrationState: this.props.registrationStore.getState(),
     };
   },
 
@@ -61,6 +69,9 @@ const RegistrationView = React.createClass({
         <RegistrationDetails event={this.state.eventState.event} />
         <RegistrationForm
           event={this.state.eventState.event}
+          createRegistrationLoading={
+            this.state.registrationState.createRegistrationLoading
+          }
           registrationActionCreators={this.props.registrationActionCreators}
         />
       </div>

@@ -109,7 +109,8 @@ page('/events/:id/register', ({ params }) => {
 
   const props = {
     messageStore, messageActionCreators,
-    eventStore, registrationActionCreators,
+    eventStore,
+    registrationStore, registrationActionCreators,
   };
 
   ReactDOM.render(
